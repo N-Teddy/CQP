@@ -54,29 +54,29 @@ const Layout = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
         <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex items-center justify-between h-16">
             {/* Left Section - Logo & Navigation */}
             <div className="flex items-center space-x-8">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                className="p-2 text-gray-600 transition-colors rounded-lg lg:hidden hover:bg-gray-100"
               >
                 <Menu size={24} />
               </button>
 
               {/* Logo */}
               <Link to="/" className="flex items-center space-x-2">
-                <div className="p-2 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-sm">
-                  <Library className="h-6 w-6 text-white" />
+                <div className="p-2 shadow-sm bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl">
+                  <Library className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xl font-bold text-gray-900 hidden sm:block">CityLibrary</span>
+                <span className="hidden text-xl font-bold text-gray-900 sm:block">CityLibrary</span>
               </Link>
 
               {/* Main Navigation */}
-              <nav className="hidden lg:flex items-center space-x-6">
+              <nav className="items-center hidden space-x-6 lg:flex">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
@@ -90,77 +90,13 @@ const Layout = () => {
                   </Link>
                 ))}
 
-                {/* Services Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setServicesDropdown(!servicesDropdown)}
-                    onBlur={() => setTimeout(() => setServicesDropdown(false), 200)}
-                    className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
-                  >
-                    <span>Services</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${servicesDropdown ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {servicesDropdown && (
-                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2">
-                      {servicesMenu.map((item) => (
-                        <Link
-                          key={item.name}
-                          to={item.href}
-                          className="flex items-start space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                          onClick={() => setServicesDropdown(false)}
-                        >
-                          <item.icon className="h-5 w-5 text-gray-400 mt-0.5" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                            <div className="text-xs text-gray-500">{item.description}</div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Resources Dropdown */}
-                {user && (
-                  <div className="relative">
-                    <button
-                      onClick={() => setResourcesDropdown(!resourcesDropdown)}
-                      onBlur={() => setTimeout(() => setResourcesDropdown(false), 200)}
-                      className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
-                    >
-                      <span>Resources</span>
-                      <ChevronDown className={`h-4 w-4 transition-transform ${resourcesDropdown ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {resourcesDropdown && (
-                      <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2">
-                        {resourcesMenu.map((item) => (
-                          <Link
-                            key={item.name}
-                            to={item.href}
-                            className="flex items-start space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                            onClick={() => setResourcesDropdown(false)}
-                          >
-                            <item.icon className="h-5 w-5 text-gray-400 mt-0.5" />
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                              <div className="text-xs text-gray-500">{item.description}</div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 {/* Admin Menu */}
                 {user?.role === 'admin' && (
                   <Link
                     to="/admin"
-                    className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
+                    className="flex items-center space-x-1 text-sm font-medium text-gray-700 transition-colors hover:text-primary-600"
                   >
-                    <Settings className="h-4 w-4" />
+                    <Settings className="w-4 h-4" />
                     <span>Admin</span>
                   </Link>
                 )}
@@ -172,7 +108,7 @@ const Layout = () => {
               {/* Help Button */}
               <button
                 onClick={() => navigate('/help')}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors hidden md:block"
+                className="hidden p-2 text-gray-600 transition-colors rounded-lg hover:bg-gray-100 md:block"
               >
                 <HelpCircle size={20} />
               </button>
@@ -186,20 +122,20 @@ const Layout = () => {
                     onClick={() => setProfileDropdown(!profileDropdown)}
                     className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    <div className="h-8 w-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                    <div className="flex items-center justify-center w-8 h-8 text-sm font-semibold text-white rounded-full shadow-sm bg-gradient-to-br from-primary-500 to-primary-600">
                       {user.firstName?.[0]?.toUpperCase()}
                     </div>
-                    <div className="hidden md:flex items-center space-x-1">
+                    <div className="items-center hidden space-x-1 md:flex">
                       <span className="text-sm font-medium text-gray-700">{user.firstName}</span>
                       <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${profileDropdown ? 'rotate-180' : ''}`} />
                     </div>
                   </button>
 
                   {profileDropdown && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100">
+                    <div className="absolute right-0 w-64 mt-2 bg-white border border-gray-100 shadow-xl rounded-xl">
                       <div className="p-4 border-b border-gray-100">
                         <div className="flex items-center space-x-3">
-                          <div className="h-12 w-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
+                          <div className="flex items-center justify-center w-12 h-12 font-semibold text-white rounded-full bg-gradient-to-br from-primary-500 to-primary-600">
                             {user.firstName?.[0]?.toUpperCase()}
                           </div>
                           <div>
@@ -218,7 +154,7 @@ const Layout = () => {
                           className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           onClick={() => setProfileDropdown(false)}
                         >
-                          <User className="h-4 w-4 text-gray-400" />
+                          <User className="w-4 h-4 text-gray-400" />
                           <span>My Profile</span>
                         </Link>
 
@@ -227,7 +163,7 @@ const Layout = () => {
                           className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           onClick={() => setProfileDropdown(false)}
                         >
-                          <LayoutDashboard className="h-4 w-4 text-gray-400" />
+                          <LayoutDashboard className="w-4 h-4 text-gray-400" />
                           <span>Dashboard</span>
                         </Link>
 
@@ -236,56 +172,34 @@ const Layout = () => {
                           className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           onClick={() => setProfileDropdown(false)}
                         >
-                          <BookMarked className="h-4 w-4 text-gray-400" />
+                          <BookMarked className="w-4 h-4 text-gray-400" />
                           <span>My Books</span>
                         </Link>
 
-                        <Link
-                          to="/membership"
-                          className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          onClick={() => setProfileDropdown(false)}
-                        >
-                          <CreditCard className="h-4 w-4 text-gray-400" />
-                          <span>Membership</span>
-                        </Link>
 
                         {user.role === 'admin' && (
                           <>
-                            <div className="border-t border-gray-100 my-2"></div>
+                            <div className="my-2 border-t border-gray-100"></div>
                             <Link
                               to="/admin"
                               className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                               onClick={() => setProfileDropdown(false)}
                             >
-                              <Settings className="h-4 w-4 text-gray-400" />
+                              <Settings className="w-4 h-4 text-gray-400" />
                               <span>Admin Panel</span>
                             </Link>
-                            <Link
-                              to="/admin/reports"
-                              className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                              onClick={() => setProfileDropdown(false)}
-                            >
-                              <BarChart3 className="h-4 w-4 text-gray-400" />
-                              <span>Reports</span>
-                            </Link>
+
                           </>
                         )}
 
-                        <div className="border-t border-gray-100 my-2"></div>
-                        <Link
-                          to="/settings"
-                          className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          onClick={() => setProfileDropdown(false)}
-                        >
-                          <Settings className="h-4 w-4 text-gray-400" />
-                          <span>Settings</span>
-                        </Link>
+                        <div className="my-2 border-t border-gray-100"></div>
+                        
 
                         <button
                           onClick={handleLogout}
                           className="flex items-center space-x-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors"
                         >
-                          <LogOut className="h-4 w-4" />
+                          <LogOut className="w-4 h-4" />
                           <span>Sign Out</span>
                         </button>
                       </div>
@@ -296,13 +210,13 @@ const Layout = () => {
                 <div className="flex items-center space-x-3">
                   <Link
                     to="/login"
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 rounded-lg transition-all shadow-sm"
+                    className="px-4 py-2 text-sm font-medium text-white transition-all rounded-lg shadow-sm bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
                   >
                     Get Started
                   </Link>
@@ -315,29 +229,29 @@ const Layout = () => {
 
       {/* Mobile Sidebar */}
       {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
+        <div className="fixed inset-0 z-50 flex lg:hidden">
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           ></div>
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-xl">
+          <div className="relative flex flex-col flex-1 w-full max-w-xs bg-white shadow-xl">
             <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-gradient-to-r from-primary-600 to-primary-700">
               <div className="flex items-center space-x-2">
-                <Library className="h-6 w-6 text-white" />
+                <Library className="w-6 h-6 text-white" />
                 <span className="text-lg font-bold text-white">CityLibrary</span>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 transition-colors rounded-lg hover:bg-white/10"
               >
                 <X size={20} className="text-white" />
               </button>
             </div>
 
             {user && (
-              <div className="p-4 bg-gray-50 border-b border-gray-200">
+              <div className="p-4 border-b border-gray-200 bg-gray-50">
                 <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
+                  <div className="flex items-center justify-center w-10 h-10 font-semibold text-white rounded-full bg-gradient-to-br from-primary-500 to-primary-600">
                     {user.firstName?.[0]?.toUpperCase()}
                   </div>
                   <div>
@@ -350,7 +264,7 @@ const Layout = () => {
 
             <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
               {/* Main Navigation */}
-              <div className="space-y-1 mb-4">
+              <div className="mb-4 space-y-1">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
@@ -370,11 +284,11 @@ const Layout = () => {
               {/* Admin Section */}
               {user?.role === 'admin' && (
                 <div className="pt-4 border-t border-gray-200">
-                  <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Administration</p>
+                  <p className="px-3 mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">Administration</p>
                   <Link
                     to="/admin"
                     onClick={() => setSidebarOpen(false)}
-                    className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="flex items-center px-3 py-2 space-x-3 text-sm text-gray-700 transition-colors rounded-lg hover:bg-gray-100"
                   >
                     <Settings size={16} className="text-gray-400" />
                     <span>Admin Panel</span>
@@ -382,7 +296,7 @@ const Layout = () => {
                   <Link
                     to="/admin/reports"
                     onClick={() => setSidebarOpen(false)}
-                    className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="flex items-center px-3 py-2 space-x-3 text-sm text-gray-700 transition-colors rounded-lg hover:bg-gray-100"
                   >
                     <BarChart3 size={16} className="text-gray-400" />
                     <span>Reports</span>
@@ -390,7 +304,7 @@ const Layout = () => {
                   <Link
                     to="/admin/users"
                     onClick={() => setSidebarOpen(false)}
-                    className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="flex items-center px-3 py-2 space-x-3 text-sm text-gray-700 transition-colors rounded-lg hover:bg-gray-100"
                   >
                     <Users size={16} className="text-gray-400" />
                     <span>User Management</span>
@@ -438,23 +352,23 @@ const Layout = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <footer className="mt-auto bg-white border-t border-gray-200">
+        <div className="px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
 
-          <div className="border-t border-gray-200 mt-8 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="pt-8 mt-8 border-t border-gray-200">
+            <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
               <p className="text-sm text-gray-500">
                 © {new Date().getFullYear()} CityLibrary. All rights reserved.
               </p>
               <div className="flex space-x-6">
-                <Link to="/privacy" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                <Link to="/privacy" className="text-sm text-gray-500 transition-colors hover:text-gray-700">
                   Privacy Policy
                 </Link>
-                <Link to="/terms" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                <Link to="/terms" className="text-sm text-gray-500 transition-colors hover:text-gray-700">
                   Terms of Service
                 </Link>
-                <Link to="/cookies" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                <Link to="/cookies" className="text-sm text-gray-500 transition-colors hover:text-gray-700">
                   Cookie Policy
                 </Link>
               </div>
