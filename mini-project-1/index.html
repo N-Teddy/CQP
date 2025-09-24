@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management App</title>
+
+    <!-- Google Fonts - Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3498db',
+                        primaryDark: '#2980b9',
+                        success: '#2ecc71',
+                        warning: '#f39c12',
+                        danger: '#e74c3c',
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1', transform: 'translateY(0)' },
+                            '100%': { opacity: '0', transform: 'translateY(-10px)' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(0)' },
+                        }
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 0.3s ease-out',
+                        fadeOut: 'fadeOut 0.3s ease-out',
+                        slideIn: 'slideIn 0.3s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .task-card-enter {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .task-card-exit {
+            animation: fadeOut 0.3s ease-out;
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+
+        .priority-high {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .priority-medium {
+            border-left: 4px solid #f39c12;
+        }
+
+        .priority-low {
+            border-left: 4px solid #2ecc71;
+        }
+
+        .completed-task {
+            opacity: 0.7;
+        }
+
+        .completed-task .task-title {
+            text-decoration: line-through;
+        }
+
+        /* Custom checkbox styling */
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .custom-checkbox.checked {
+            background-color: #3498db;
+            position: relative;
+        }
+
+        .custom-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Hover effects */
+        .task-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-primary text-white p-6 shadow-lg">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold mb-4">Task Management</h1>
+            <!-- Search Bar -->
+            <div class="relative max-w-xl">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search tasks..."
+                    class="w-full px-4 py-2 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+                >
+                <svg class="absolute right-3 top-2.5 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Filters Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Filters</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Priority Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                    <select id="priorityFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="all">All Priorities</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+
+                <!-- Due Date Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                    <select id="dateFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="all">All Dates</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="all">All Tasks</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Clear Filters Button -->
+            <button id="clearFilters" class="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                Clear Filters
+            </button>
+        </div>
+
+        <!-- Tasks Container -->
+        <div id="tasksContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Tasks will be dynamically added here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">No tasks found</h3>
+            <p class="mt-1 text-gray-500">Get started by creating a new task.</p>
+        </div>
+    </div>
+
+    <!-- Floating Add Button -->
+    <button id="addTaskBtn" class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:bg-primaryDark transform hover:scale-110 transition-all duration-200 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+    </button>
+
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative animate-fadeIn">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Add New Task</h2>
+
+                <form id="addTaskForm">
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                        <input
+                            type="text"
+                            id="taskTitle"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="Enter task title"
+                        >
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea
+                            id="taskDescription"
+                            rows="3"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="Enter task description"
+                        ></textarea>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                        <select id="taskPriority" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+
+                    <!-- Due Date -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                        <input
+                            type="date"
+                            id="taskDueDate"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex justify-end space-x-3">
+                        <button
+                            type="button"
+                            id="cancelAddTask"
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition-colors"
+                        >
+                            Add Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task Manager Class
+        class TaskManager {
+            constructor() {
+                this.tasks = this.loadTasks();
+                this.filters = {
+                    search: '',
+                    priority: 'all',
+                    date: 'all',
+                    status: 'all'
+                };
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.renderTasks();
+            }
+
+            loadTasks() {
+                const stored = localStorage.getItem('tasks');
+                return stored ? JSON.parse(stored) : [];
+            }
+
+            saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(this.tasks));
+            }
+
+            generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+
+            addTask(taskData) {
+                const task = {
+                    id: this.generateId(),
+                    title: taskData.title,
+                    description: taskData.description,
+                    priority: taskData.priority,
+                    dueDate: taskData.dueDate,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                this.tasks.unshift(task);
+                this.saveTasks();
+                this.renderTasks();
+            }
+
+            deleteTask(taskId) {
+                const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+                if (taskCard) {
+                    taskCard.classList.add('task-card-exit');
+                    setTimeout(() => {
+                        this.tasks = this.tasks.filter(task => task.id !== taskId);
+                        this.saveTasks();
+                        this.renderTasks();
+                    }, 300);
+                }
+            }
+
+            toggleComplete(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.completed = !task.completed;
+                    this.saveTasks();
+                    this.renderTasks();
+                }
+            }
+
+            getFilteredTasks() {
+                let filtered = [...this.tasks];
+
+                // Search filter
+                if (this.filters.search) {
+                    const searchLower = this.filters.search.toLowerCase();
+                    filtered = filtered.filter(task =>
+                        task.title.toLowerCase().includes(searchLower) ||
+                        task.description.toLowerCase().includes(searchLower)
+                    );
+                }
+
+                // Priority filter
+                if (this.filters.priority !== 'all') {
+                    filtered = filtered.filter(task => task.priority === this.filters.priority);
+                }
+
+                // Date filter
+                if (this.filters.date !== 'all') {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    filtered = filtered.filter(task => {
+                        if (!task.dueDate) return false;
+
+                        const dueDate = new Date(task.dueDate);
+                        dueDate.setHours(0, 0, 0, 0);
+
+                        switch(this.filters.date) {
+                            case 'overdue':
+                                return dueDate < today && !task.completed;
+                            case 'today':
+                                return dueDate.getTime() === today.getTime();
+                            case 'week':
+                                const weekFromNow = new Date(today);
+                                weekFromNow.setDate(weekFromNow.getDate() + 7);
+                                return dueDate >= today && dueDate <= weekFromNow;
+                            case 'month':
+                                const monthFromNow = new Date(today);
+                                monthFromNow.setMonth(monthFromNow.getMonth() + 1);
+                                return dueDate >= today && dueDate <= monthFromNow;
+                            default:
+                                return true;
+                        }
+                    });
+                }
+
+                // Status filter
+                if (this.filters.status !== 'all') {
+                    filtered = filtered.filter(task =>
+                        this.filters.status === 'completed' ? task.completed : !task.completed
+                    );
+                }
+
+                return filtered;
+            }
+
+            formatDate(dateString) {
+                if (!dateString) return 'No due date';
+
+                const date = new Date(dateString);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                date.setHours(0, 0, 0, 0);
+
+                const diffTime = date - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays < 0) return `Overdue by ${Math.abs(diffDays)} days`;
+                if (diffDays === 0) return 'Due today';
+                if (diffDays === 1) return 'Due tomorrow';
+                if (diffDays <= 7) return `Due in ${diffDays} days`;
+
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            getPriorityColor(priority) {
+                switch(priority) {
+                    case 'high': return 'text-danger bg-red-50';
+                    case 'medium': return 'text-warning bg-orange-50';
+                    case 'low': return 'text-success bg-green-50';
+                    default: return 'text-gray-600 bg-gray-50';
+                }
+            }
+
+            renderTasks() {
+                const container = document.getElementById('tasksContainer');
+                const emptyState = document.getElementById('emptyState');
+                const filteredTasks = this.getFilteredTasks();
+
+                if (filteredTasks.length === 0) {
+                    container.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+
+                container.innerHTML = filteredTasks.map(task => `
+                    <div class="task-card bg-white rounded-lg shadow-md p-4 priority-${task.priority} ${task.completed ? 'completed-task' : ''} task-card-enter" data-task-id="${task.id}">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-start flex-1">
+                                <div class="custom-checkbox ${task.completed ? 'checked' : ''} mr-3 mt-1" onclick="taskManager.toggleComplete('${task.id}')"></div>
+                                <div class="flex-1">
+                                    <h3 class="task-title text-lg font-semibold text-gray-800 ${task.completed ? 'line-through' : ''}">${task.title}</h3>
+                                    ${task.description ? `<p class="text-gray-600 text-sm mt-1">${task.description}</p>` : ''}
+                                </div>
+                            </div>
+                            <button onclick="taskManager.deleteTask('${task.id}')" class="text-red-500 hover:text-red-700 ml-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="px-2 py-1 text-xs font-medium rounded-full ${this.getPriorityColor(task.priority)}">
+                                ${task.priority.toUpperCase()}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                ${this.formatDate(task.dueDate)}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            bindEvents() {
+                // Add task button
+                document.getElementById('addTaskBtn').addEventListener('click', () => {
+                    document.getElementById('addTaskModal').classList.remove('hidden');
+                    // Set min date to today
+                    document.getElementById('taskDueDate').min = new Date().toISOString().split('T')[0];
+                });
+
+                // Cancel add task
+                document.getElementById('cancelAddTask').addEventListener('click', () => {
+                    document.getElementById('addTaskModal').classList.add('hidden');
+                    document.getElementById('addTaskForm').reset();
+                });
+
+                // Close modal on backdrop click
+                document.querySelector('.modal-backdrop').addEventListener('click', () => {
+                    document.getElementById('addTaskModal').classList.add('hidden');
+                    document.getElementById('addTaskForm').reset();
+                });
+
+                // Add task form submit
+                document.getElementById('addTaskForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+
+                    const taskData = {
+                        title: document.getElementById('taskTitle').value,
+                        description: document.getElementById('taskDescription').value,
+                        priority: document.getElementById('taskPriority').value,
+                        dueDate: document.getElementById('taskDueDate').value
+                    };
+
+                    this.addTask(taskData);
+                    document.getElementById('addTaskModal').classList.add('hidden');
+                    document.getElementById('addTaskForm').reset();
+                });
+
+                // Search
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.filters.search = e.target.value;
+                    this.renderTasks();
+                });
+
+                // Priority filter
+                document.getElementById('priorityFilter').addEventListener('change', (e) => {
+                    this.filters.priority = e.target.value;
+                    this.renderTasks();
+                });
+
+                // Date filter
+                document.getElementById('dateFilter').addEventListener('change', (e) => {
+                    this.filters.date = e.target.value;
+                    this.renderTasks();
+                });
+
+                // Status filter
+                document.getElementById('statusFilter').addEventListener('change', (e) => {
+                    this.filters.status = e.target.value;
+                    this.renderTasks();
+                });
+
+                // Clear filters
+                document.getElementById('clearFilters').addEventListener('click', () => {
+                    this.filters = {
+                        search: '',
+                        priority: 'all',
+                        date: 'all',
+                        status: 'all'
+                    };
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('priorityFilter').value = 'all';
+                    document.getElementById('dateFilter').value = 'all';
+                    document.getElementById('statusFilter').value = 'all';
+                    this.renderTasks();
+                });
+            }
+        }
+
+        // Initialize the app
+        const taskManager = new TaskManager();
+    </script>
+</body>
+</html>
